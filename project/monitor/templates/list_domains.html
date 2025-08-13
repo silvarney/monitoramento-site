@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Domínios Cadastrados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    {% include '_menu.html' %}
+    <div class="max-w-3xl mx-auto py-10">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">Domínios Cadastrados</h1>
+            <div>
+                <a href="/add-site/" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2">Adicionar novo domínio</a>
+                <a href="/logout/" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">Sair</a>
+            </div>
+        </div>
+        <form method="post" class="mb-6 bg-white rounded shadow-md p-4 flex items-center gap-4">
+            {% csrf_token %}
+            <label for="intervalo" class="font-semibold">Verificar todos os domínios:</label>
+            <select name="intervalo" id="intervalo" class="border rounded px-2 py-1">
+                <option value="agora" {% if intervalo_selecionado == 'agora' %}selected{% endif %}>Agora</option>
+                <option value="5" {% if intervalo_selecionado == '5' %}selected{% endif %}>A cada 5 minutos</option>
+                <option value="15" {% if intervalo_selecionado == '15' %}selected{% endif %}>A cada 15 minutos</option>
+                <option value="30" {% if intervalo_selecionado == '30' %}selected{% endif %}>A cada 30 minutos</option>
+                <option value="60" {% if intervalo_selecionado == '60' %}selected{% endif %}>A cada 1 hora</option>
+            </select>
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Executar</button>
+                        {% if notificacao %}
+                                <span id="notificacao-alerta" class="ml-4 px-3 py-1 rounded bg-blue-100 text-blue-800 border border-blue-300">{{ notificacao }}</span>
+                                <script>
+                                    setTimeout(function() {
+                                        var alerta = document.getElementById('notificacao-alerta');
+                                        if (alerta) alerta.style.display = 'none';
+                                    }, 5000);
+                                </script>
+                        {% endif %}
+        </form>
+        <div class="bg-white rounded shadow-md overflow-x-auto">
+            <table class="min-w-full table-auto">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="px-4 py-2">Domínio</th>
+                        <th class="px-4 py-2">Status</th>
+                        <th class="px-4 py-2">Tempo de resposta (ms)</th>
+                        <th class="px-4 py-2">Data de cadastro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for d in domains %}
+                    <tr class="border-b">
+                        <td class="px-4 py-2">
+                            <a href="/domains/{{ d.id }}/" class="text-blue-600 hover:underline">{{ d.domain }}</a>
+                        </td>
+                        <td class="px-4 py-2">{% if d.status %}<span class="text-green-600 font-semibold">Online</span>{% else %}<span class="text-red-600 font-semibold">Offline</span>{% endif %}</td>
+                        <td class="px-4 py-2">{% if d.response_time %}{{ d.response_time|floatformat:2 }}{% else %}-{% endif %}</td>
+                        <td class="px-4 py-2">{{ d.date_added|date:'d/m/Y H:i' }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center py-4">Nenhum domínio cadastrado.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

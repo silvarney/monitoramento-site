@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Novo Usuário</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    {% include '_menu.html' %}
+    <div class="flex items-center justify-center min-h-[80vh]">
+        <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+            <h1 class="text-2xl font-bold mb-6 text-center">Novo Usuário</h1>
+            {% if error %}
+                <div class="mb-4 text-red-600 text-center">{{ error }}</div>
+            {% endif %}
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Cadastrar</button>
+            </form>
+            <div class="mt-4 text-center">
+                <a href="/users/" class="text-blue-600 hover:underline">Voltar para a listagem</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

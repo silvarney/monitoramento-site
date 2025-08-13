@@ -1,0 +1,3 @@
+Django
+prometheus_client
+requests

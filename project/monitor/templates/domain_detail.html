@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes do Domínio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    {% include '_menu.html' %}
+    <div class="max-w-2xl mx-auto py-10">
+        <h1 class="text-2xl font-bold mb-6">Detalhes do Domínio</h1>
+        <div class="bg-white rounded shadow-md p-6 mb-6">
+            <p><span class="font-semibold">Domínio:</span> {{ domain.domain }}</p>
+            <p><span class="font-semibold">Status:</span> {% if domain.status %}<span class="text-green-600 font-semibold">Online</span>{% else %}<span class="text-red-600 font-semibold">Offline</span>{% endif %}</p>
+            <p><span class="font-semibold">Tempo de resposta (ms):</span>
+                {% if domain.response_time %}{{ domain.response_time|floatformat:2 }}{% else %}-{% endif %}
+            </p>
+            <p><span class="font-semibold">Data de cadastro:</span> {{ domain.date_added }}</p>
+        </div>
+            <!-- Formulário de verificação removido, mantendo apenas o histórico abaixo -->
+            <div class="bg-white rounded shadow-md p-6">
+                <h2 class="text-xl font-bold mb-4">Histórico de Verificações</h2>
+                <table class="min-w-full table-auto">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2">Data/Hora</th>
+                            <th class="px-4 py-2">Status</th>
+                            <th class="px-4 py-2">HTTP</th>
+                            <th class="px-4 py-2">Resp. (ms)</th>
+                            <th class="px-4 py-2">DNS (ms)</th>
+                            <th class="px-4 py-2">TLS (ms)</th>
+                            <th class="px-4 py-2">Tamanho (bytes)</th>
+                            <th class="px-4 py-2">Links Quebrados</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for check in checks %}
+                        <tr class="border-b">
+                            <td class="px-4 py-2">{{ check.checked_at|date:'d/m/Y H:i:s' }}</td>
+                            <td class="px-4 py-2">{% if check.status %}<span class="text-green-600 font-semibold">Online</span>{% else %}<span class="text-red-600 font-semibold">Offline</span>{% endif %}</td>
+                            <td class="px-4 py-2">{{ check.http_status|default:'-' }}</td>
+                            <td class="px-4 py-2">
+                                {% if check.response_time_ms %}{{ check.response_time_ms|floatformat:2 }}
+                                {% elif check.response_time %}{{ check.response_time|floatformat:2 }}
+                                {% else %}-{% endif %}
+                            </td>
+                            <td class="px-4 py-2">{% if check.dns_lookup_time_ms %}{{ check.dns_lookup_time_ms|floatformat:2 }}{% else %}-{% endif %}</td>
+                            <td class="px-4 py-2">{% if check.tls_handshake_time_ms %}{{ check.tls_handshake_time_ms|floatformat:2 }}{% else %}-{% endif %}</td>
+                            <td class="px-4 py-2">{% if check.content_size_bytes %}{{ check.content_size_bytes }}{% else %}-{% endif %}</td>
+                            <td class="px-4 py-2">{% if check.broken_links_count or check.broken_links_count == 0 %}{{ check.broken_links_count }}{% else %}-{% endif %}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="8" class="text-center py-4">Nenhum registro encontrado.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% if page_obj %}
+                <div class="flex justify-between items-center mt-4">
+                    <div>Pagina {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</div>
+                    <div class="space-x-2">
+                        {% if page_obj.has_previous %}
+                            <a class="px-3 py-1 bg-gray-200 rounded" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                            <a class="px-3 py-1 bg-gray-200 rounded" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        <a href="/domains/" class="text-blue-600 hover:underline">Voltar para a listagem</a>
+    </div>
+</body>
+</html>
